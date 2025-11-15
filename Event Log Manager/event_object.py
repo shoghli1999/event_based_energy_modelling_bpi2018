@@ -27,12 +27,15 @@ class EventObject:
                 f"event_type='{self.event_type}', "
                 f"timestamp='{self.timestamp}', duration={self.duration:.2f})")
 
+    #Looks up the base cost for this event_type in the global dict BASECOSTS and multiplies by global COST_SCALE.
     def get_base_cost(self):
         return __BASECOSTS__.get(self.event_type) * __COST_SCALE__
 
+    #Returns True if a given event_id appears in this event’s case_history and case_id equals provided case_identifier.
     def is_subsequent_event(self, event_id, case_identifier):
         return event_id in self.case_history and self.case_id == case_identifier
 
+    #This adds cost every 900 seconds (15 minutes) if the event is late.
     def get_time_diff_cost(self, end_timestamp):
         time_diff = self.timestamp - end_timestamp
         time_diff_cost = 0
@@ -43,6 +46,7 @@ class EventObject:
 
         return time_diff_cost
 
+    #Total cost of ending event
     def determine_end_event_cost(self, timestamp):
         return self.get_base_cost() + self.get_time_diff_cost(timestamp) + self.get_base_cost() * __END_SCALE__
 
